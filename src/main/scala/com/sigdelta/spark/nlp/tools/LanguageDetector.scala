@@ -22,7 +22,10 @@ import com.optimaize.langdetect.LanguageDetectorBuilder
 import com.optimaize.langdetect.ngram.NgramExtractors
 import com.optimaize.langdetect.profiles.LanguageProfileReader
 import com.optimaize.langdetect.text.{CommonTextObjectFactories, TextObjectFactory}
-
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.expressions.UserDefinedFunction
+import org.apache.spark.sql.functions.udf
+import org.apache.spark.sql.types.StringType
 
 class LanguageDetector extends Serializable {
 
@@ -41,8 +44,20 @@ class LanguageDetector extends Serializable {
     else
       None
   }
+
 }
 
 object LanguageDetector {
-  def apply(): LanguageDetector = new LanguageDetector()
+
+  private lazy val languageDetector: LanguageDetector = new LanguageDetector()
+
+  def apply(): LanguageDetector = languageDetector
+
+  def detect(text: String): Option[String] = languageDetector.detect(text)
+
+  def registerUdf: UserDefinedFunction = {
+    val spark = SparkSession.builder().getOrCreate()
+
+    spark.udf.register("lang", (text: String) => detect(text))
+  }
 }

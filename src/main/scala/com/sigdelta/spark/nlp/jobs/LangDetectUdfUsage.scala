@@ -19,7 +19,7 @@ package com.sigdelta.spark.nlp.jobs
 
 import com.sigdelta.spark.nlp.tools.{LanguageDetectorObject, LanguageDetector}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.udf
+import org.apache.spark.sql.functions._
 
 object LangDetectUdfUsage {
   def main(args: Array[String]): Unit = {
@@ -33,10 +33,6 @@ object LangDetectUdfUsage {
     val sampleText = "Now what is that?"
     println(sampleText, languageDetector.detect(sampleText))
 
-    val ldBcast = spark.sparkContext.broadcast(languageDetector)
-
-    val ldUdf = udf((text: String) => ldBcast.value.detect(text))
-
     val df = List(
       "To będzie po polsku.",
       "And this is in English.",
@@ -44,9 +40,16 @@ object LangDetectUdfUsage {
 
     df.show()
 
+    // Creating UDF with a broadcasted class
+    val ldBcast = spark.sparkContext.broadcast(languageDetector)
+    val ldUdf = udf((text: String) => ldBcast.value.detect(text))
     df.select('text, ldUdf('text).as('lang)).show()
 
-    // alternatively we can call Scala Object inside UDF (instead of broadcasted object)
+    // you can also use companion object directly
+    val ldCompanionUdf = udf((text: String) => LanguageDetector.detect(text))
+    df.select('text, ldCompanionUdf('text).as('lang)).show()
+
+    // alternatively you can use full object implementation (just lazy without transient)
     val ldAsObjectUdf = udf((text: String) => LanguageDetectorObject.detect(text))
     df.select('text, ldAsObjectUdf('text).as('lang)).show()
   }
