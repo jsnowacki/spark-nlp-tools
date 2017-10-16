@@ -17,7 +17,7 @@
 
 package com.sigdelta.spark.nlp.jobs
 
-import com.sigdelta.spark.nlp.tools.LanguageDetector
+import com.sigdelta.spark.nlp.tools.{Language, LanguageDetector}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.udf
 
@@ -46,5 +46,8 @@ object LangDetectUdfUsage {
 
     df.select('text, ldUdf('text).as('lang)).show()
 
+    // alternatively we can call Scala Object inside UDF (instead of broadcasted object)
+    val ldAsObjectUdf = udf((text: String) => Language.detect(text))
+    df.select('text, ldAsObjectUdf('text).as('lang)).show()
   }
 }
