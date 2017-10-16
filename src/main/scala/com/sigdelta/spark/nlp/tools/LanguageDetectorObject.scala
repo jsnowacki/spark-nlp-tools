@@ -23,7 +23,7 @@ import com.optimaize.langdetect.text.{CommonTextObjectFactories, TextObjectFacto
 /**
   * Alternative solution to LanguageDetector
   */
-object Language {
+object LanguageDetectorObject {
   lazy val languageDetector: langdetect.LanguageDetector = {
     val languageProfiles = new LanguageProfileReader().readAllBuiltIn
     LanguageDetectorBuilder.create(NgramExtractors.standard).withProfiles(languageProfiles).build
