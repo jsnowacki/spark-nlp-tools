@@ -11,8 +11,8 @@ javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
 
 // Note the dependencies are provided
 libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-core" % sparkVersion % "compile",
-  "org.apache.spark" %% "spark-sql" % sparkVersion % "compile",
+  "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
+  "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
   "com.optimaize.languagedetector" % "language-detector" % "0.6"
 )
 

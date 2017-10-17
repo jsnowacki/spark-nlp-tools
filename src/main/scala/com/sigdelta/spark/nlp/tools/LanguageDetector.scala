@@ -25,7 +25,6 @@ import com.optimaize.langdetect.text.{CommonTextObjectFactories, TextObjectFacto
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.udf
-import org.apache.spark.sql.types.StringType
 
 class LanguageDetector extends Serializable {
 
@@ -55,9 +54,12 @@ object LanguageDetector {
 
   def detect(text: String): Option[String] = languageDetector.detect(text)
 
+  def getUdf: UserDefinedFunction = udf((text: String) => detect(text))
+
   def registerUdf: UserDefinedFunction = {
     val spark = SparkSession.builder().getOrCreate()
 
     spark.udf.register("lang", (text: String) => detect(text))
   }
+
 }
