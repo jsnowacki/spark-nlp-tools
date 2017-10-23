@@ -56,10 +56,13 @@ object LanguageDetector {
 
   def getUdf: UserDefinedFunction = udf((text: String) => detect(text))
 
-  def registerUdf: UserDefinedFunction = {
+  def registerUdf(alias: String): UserDefinedFunction = {
     val spark = SparkSession.builder().getOrCreate()
 
-    spark.udf.register("lang", (text: String) => detect(text))
+    spark.udf.register(alias, (text: String) => detect(text))
   }
+
+  // Alias can be done with default, but this way plays better with Py4j
+  def registerUdf: UserDefinedFunction = registerUdf("lang")
 
 }
